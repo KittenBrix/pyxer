@@ -1,0 +1,29 @@
+
+
+basic structure of an instrument.
+Instruments contain one or more samples
+	samples in turn contain one or more wavefunctions (WaveFormFunction)
+		A waveformfunction has a static frequency, a sin/square/sawtooth or
+		derivative function, and a volume function. 
+
+the basic idea is that we define a sample's 440hz shape.
+the waveform functions the sample contains are fed modified information about the
+frame they need to output. whereas normally they expect sequential calls with 
+incremented frames (eg, ......1200, 1201, 1202.....30003, 30004...etc), this 
+would produce 440hz no matter what. Instead the input frame is multiplied
+by the sample's requested frequency over 440. 
+
+Waveformfunctions operate on 440.
+samples operate on variable frequency.
+instruments direct their samples' frequency.
+
+
+
+
+
+Later on, a "note" will have an instrument, pitch function (returns frequency),
+volume function (similar to the waveformfunction's), modulation function, and
+may also have other special functions. idk. they'd be somewhat similar to plugins.
+a note would be contained inside a track, which provides the instrument.
+
+
