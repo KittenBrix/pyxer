@@ -61,8 +61,8 @@ class Sample:
         '''
         vol = 1.0/len(self.waveFormsFuncs)
         for i in range(self.beatRateLength()):
-            for func in self.waveFormsFuncs:
-                self.waveForm[i] += vol * func(self, i, previousFrames + i)
+            for WFF in self.waveFormsFuncs:
+                self.waveForm[i] += vol * WFF.playFunction( i, self.sampleRate) * WFF.volFunction(i, self.sampleRate)
 
 
 
@@ -73,33 +73,44 @@ class Sample:
         frame = current frame on the note.
         currentframe = within the context of the song, this is the total number of frames so far.
     '''
-
-
-
 class WaveFormFunction:
     volFunction = getConstantVol(1)
-    playFunction = SimpleSine
-    
-    frequency = 440
+    playFunction = getSimpleSin()
+    FREQ = 440
 
+    def __init__(self, frq, typ="sin"):
+        self.FREQ = frq
+        volFunction = getConstantVol(0.8)
+        playFunction = getSimpleWave(typ)
 
-
-    def __init__(self):
-
-
-
-
-
-
-
+    def setConstantVolume(volume):
+        volFunction = getConstantVol(volume)
 
     def getConstantVol(volume):
-        def getConstantVolume():
+        def lambdaVolume(self,frame = 0, rate =0):
             return volume
-        return getConstantVolume
+        return lambdaVolume
+
+    def setFrequency(self, frq):
+        self.FREQ = frq
 
 
-
+    '''
+    use to obtain a basic wave form function.
+    '''
+    def getSimpleWave(typ = "sin", option = math.sin(math.pi / 4)):
+        if (typ.contains("sin")):
+            def lambdaSine(self, frame, rate):
+                return SimpleSine(self.FREQ, frame, rate)
+            return lambdaSine
+        if (typ.contains("sqr")):
+            def lambdaSqr(self, frame, rate):
+                return SimpleSquare(self.FREQ, frame, rate)
+            return lambdaSqr
+        if (typ.contains("rect")):
+            def lambdaRect(self, frame, rate):
+                return SimpleRectangle(self.FREQ, frame, rate, option)
+            return lambdaRect
 
 
 #simple sine. produces a sin wave frame value based on frame number, frequency, and sample rate
@@ -110,7 +121,7 @@ def SimpleSine(frequency,frame, rate):
 def SimpleSquare(frequency, frame, rate):
     return 1.0 if (math.sin(frequency * frame * 2 * math.pi / rate) > 0) else 0
 
-
+#
 def SimpleRectangle(frequency, frame, rate, cutoff = math.sin(math.pi / 4)):
     return 1.0 if (math.sin(frequency * frame * 2 * math.pi / rate) > cutoff) else 0
 

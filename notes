@@ -1,3 +1,5 @@
+requires numpy
+
 
 
 basic structure of an instrument.
@@ -11,7 +13,13 @@ the waveform functions the sample contains are fed modified information about th
 frame they need to output. whereas normally they expect sequential calls with 
 incremented frames (eg, ......1200, 1201, 1202.....30003, 30004...etc), this 
 would produce 440hz no matter what. Instead the input frame is multiplied
-by the sample's requested frequency over 440. 
+by the sample's requested frequency over 440. so for example, if the sample wants
+220hz, it will feed frames to it's waveform in the sequence 1201,1201.5,1202,1202.5,etc
+
+If you want a sample that has 4 sin waveforms, one at the base 440, one at 660, one at 880
+and one at 40, then instantiate each waveform with the given bases. eg:
+	func = new WaveFormFunction(660)
+ 
 
 Waveformfunctions operate on 440.
 samples operate on variable frequency.
