@@ -60,7 +60,7 @@ class Instrument:
         G.setsampwidth(2)
         G.setframerate(rate)
         data = []
-        for i in range(rate * seconds):
+        for i in range(int(rate * seconds)):
             data.append(self.play(i))
         print(data)
         self.write(G,data)
@@ -69,5 +69,9 @@ class Instrument:
 
     def write(self, afile,data):
         for val in data:
+            if (val > 1.0):
+                val = 1.0
+            if (val < -1.0):
+                val = -1.0
             afile.writeframesraw(struct.pack('<h',int(val * 32767)))
         afile.writeframes('')

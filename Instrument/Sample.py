@@ -12,6 +12,7 @@
 import numpy as np
 import sys
 import pyaudio, wave, math
+import struct
 
 #   use this to stream in real time instead of just write the data.
 #https://stackoverflow.com/questions/31674416/python-realtime-audio-streaming-with-pyaudio-or-something-else
@@ -102,7 +103,9 @@ class WaveFormFunction:
     volFunction = ''
     playFunction = ''
     FREQ = ''
-
+    sourcepath = ''
+    source = []
+    sourcerate = ''
     def __init__(self, frq = 440, typ="sin"):
         self.FREQ = frq
         self.volFunction = self.getConstantVol(0.8)
@@ -136,6 +139,31 @@ class WaveFormFunction:
             def lambdaRect(self, frame, rate):
                 return SimpleRectangle(self.FREQ, frame, rate, option)
             return lambdaRect
+
+    def getSourceWave(self):
+        def lambdaSource(self,frame,rate):
+            frm = int(frame * self.sourcerate / rate )
+            if (frm >= len(self.source)):
+                return 0.0
+            return self.source[frm]
+        return lambdaSource
+
+    def useSourceFile(self,sourcep):
+        #using solution from https://stackoverflow.com/questions/7769981/how-to-convert-wave-file-to-float-amplitude
+        self.sourcepath = sourcep
+        w = wave.open(self.sourcepath)
+        print("opened file succesfully")
+        #populate source array with values direct from the wav file
+        astr = w.readframes(w.getnframes())
+        # convert binary chunks to short
+        a = struct.unpack("%ih" % (w.getnframes()* w.getnchannels()), astr)
+        self.source = [float(val) / math.pow(2, 15) for val in a]
+        self.sourcerate = w.getframerate()
+        #modify playFunction to utilize this info.
+        self.playFunction = self.getSourceWave()
+
+
+
 
 
 #simple sine. produces a sin wave frame value based on frame number, frequency, and sample rate
