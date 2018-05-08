@@ -9,7 +9,9 @@
 #       Fixed:      function shape between x = 0 and x = 1 dictates volume over duration of one second
 #
 
-import numpy, sys, pyaudio, wav
+import numpy as np
+import sys
+import pyaudio, wave, math
 
 #   use this to stream in real time instead of just write the data.
 #https://stackoverflow.com/questions/31674416/python-realtime-audio-streaming-with-pyaudio-or-something-else
@@ -74,19 +76,19 @@ class Sample:
         currentframe = within the context of the song, this is the total number of frames so far.
     '''
 class WaveFormFunction:
-    volFunction = getConstantVol(1)
-    playFunction = getSimpleSin()
-    FREQ = 440
+    volFunction = ''
+    playFunction = ''
+    FREQ = ''
 
-    def __init__(self, frq, typ="sin"):
+    def __init__(self, frq = 440, typ="sin"):
         self.FREQ = frq
-        volFunction = getConstantVol(0.8)
-        playFunction = getSimpleWave(typ)
+        self.volFunction = self.getConstantVol(0.8)
+        self.playFunction = self.getSimpleWave(typ)
 
-    def setConstantVolume(volume):
-        volFunction = getConstantVol(volume)
+    def setConstantVolume(self,volume):
+        self.volFunction = getConstantVol(volume)
 
-    def getConstantVol(volume):
+    def getConstantVol(self,volume):
         def lambdaVolume(self,frame = 0, rate =0):
             return volume
         return lambdaVolume
@@ -98,16 +100,16 @@ class WaveFormFunction:
     '''
     use to obtain a basic wave form function.
     '''
-    def getSimpleWave(typ = "sin", option = math.sin(math.pi / 4)):
-        if (typ.contains("sin")):
+    def getSimpleWave(self,typ = "sin", option = math.sin(math.pi / 4)):
+        if ("sin" in typ):
             def lambdaSine(self, frame, rate):
                 return SimpleSine(self.FREQ, frame, rate)
             return lambdaSine
-        if (typ.contains("sqr")):
+        if ("sqr" in typ):
             def lambdaSqr(self, frame, rate):
                 return SimpleSquare(self.FREQ, frame, rate)
             return lambdaSqr
-        if (typ.contains("rect")):
+        if ("rect" in typ):
             def lambdaRect(self, frame, rate):
                 return SimpleRectangle(self.FREQ, frame, rate, option)
             return lambdaRect
