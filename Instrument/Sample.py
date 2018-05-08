@@ -42,7 +42,7 @@ class Sample:
         #samplerate = frames per second
         #beatlengthseconds = Seconds
         # F/S * S = Frames
-        return int(this.sampleRate * this.beatLengthSeconds())
+        return int(self.sampleRate * self.beatLengthSeconds())
 
     # [function definition (self, int frame, long currentframetotal)]
     waveFormsFuncs = []
@@ -55,20 +55,43 @@ class Sample:
         self.frequency = frequency
         self.noteDuration = duration
 
+    def addFunc(self,freq,typ='sin',volume = 1):
+        '''
+        adds a waveformfunction to the funcs array of the given form and frequency
+        '''
+        F = WaveFormFunction(freq, typ)
+        F.setConstantVolume(volume)
+        self.waveFormsFuncs.append(F)
 
-    def writeToWaveForm(self, previousFrames = 0):
+
+
+
+    def writeToWaveForm(self, instrumentFrequency, previousFrames = 0):
         '''
         for each frame, execute waveformfuncs and add them to the current frame, reducing volume based on number of funcs.
         pass in previous frames so that the func can use them if need be for matching previous note end.
         '''
         vol = 1.0/len(self.waveFormsFuncs)
-        for i in range(self.beatRateLength()):
+        LENGTH = self.beatRateLength()
+        #verify appropriate length in waveForm array
+        while (len(self.waveForm) < LENGTH):
+            self.waveForm.append(0)
+        for i in range(LENGTH):
             for WFF in self.waveFormsFuncs:
-                self.waveForm[i] += vol * WFF.playFunction( i, self.sampleRate) * WFF.volFunction(i, self.sampleRate)
+                self.waveForm[i] += vol * WFF.playFunction(WFF, (i+previousFrames) *self.frequency/self.A4 * instrumentFrequency/A4, self.sampleRate) * WFF.volFunction(WFF,  (i+previousFrames) *self.frequency/self.A4 * instrumentFrequency/self.A4, self.sampleRate)
 
 
-
-
+    def play(self, instrumentFrequency, frame):
+        vol = 1.0/len(self.waveFormsFuncs)
+        val = 0.0
+        # print(self.A4)
+        # print(self.frequency)
+        # print(instrumentFrequency)
+        # print(frame)
+        frm = frame *float(self.frequency)/float(self.A4) * float(instrumentFrequency)/float(self.A4)
+        for WFF in self.waveFormsFuncs:
+            val += vol * WFF.playFunction(WFF, frm , self.sampleRate) * WFF.volFunction(WFF,  frm, self.sampleRate)
+        return val
 
 
     '''
@@ -86,7 +109,7 @@ class WaveFormFunction:
         self.playFunction = self.getSimpleWave(typ)
 
     def setConstantVolume(self,volume):
-        self.volFunction = getConstantVol(volume)
+        self.volFunction = self.getConstantVol(volume)
 
     def getConstantVol(self,volume):
         def lambdaVolume(self,frame = 0, rate =0):
