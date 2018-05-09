@@ -119,6 +119,17 @@ class WaveFormFunction:
             return volume
         return lambdaVolume
 
+    def setLFOVolume(self,midpoint =0.6,sinamplitude =0.5, freq = 11):
+        def lambdaLFO(self, frame = 0, rate = 0):
+            x = midpoint + sinamplitude*SimpleSine(freq, frame, rate)
+            if (x > 1.0):
+                x = 1.0
+            if (x < 0):
+                x = 0
+            return x
+        return lambdaLFO
+
+
     def setFrequency(self, frq):
         self.FREQ = frq
 
