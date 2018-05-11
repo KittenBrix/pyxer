@@ -1,0 +1,19 @@
+{
+  "name": "electron-pyxer",
+  "version": "0.0.1",
+  "description": "electron/python based midi production suite",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KittenBrix/pyxer.git"
+  },
+  "author": "Lucas Phillips",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/KittenBrix/pyxer/issues"
+  },
+  "homepage": "https://github.com/KittenBrix/pyxer#readme"
+}
